@@ -1,11 +1,14 @@
-GRID_W = 8;
-GRID_H = 7;
-START_LENGTH = 3;
-FPS = 10;
+const GRID_W = 8;
+const GRID_H = 7;
+const START_LENGTH = 3;
+const FPS = 6;
 
+var fps = FPS;
 var velocity = null;
 var snake_length = START_LENGTH;
-var grid = document.querySelector(".grid");
+const grid = document.querySelector(".grid");
+const speed_div = document.querySelector(".speed");
+const speed_dial = document.querySelector(".dial");
 
 // make board:
 for (let i = 0; i < GRID_W*GRID_H; i++) {
@@ -14,26 +17,40 @@ for (let i = 0; i < GRID_W*GRID_H; i++) {
     grid.appendChild(square);
 }
 
-document.addEventListener("keydown", (e) => {
-    velocity = e.key;
-});
+// speed:
+speed_div.innerHTML = "FPS: " + FPS;
+speed_dial.value = FPS;
 
-var snakes = [[Math.floor(GRID_W/2),Math.floor(GRID_H/2)]];
+speed_dial.addEventListener("input", (e) => {
+    fps = e.target.value;
+    speed_div.innerHTML = "FPS: " + fps;
+
+})
+
+var snakes = [[Math.floor(GRID_W/2) -1 ,Math.floor(GRID_H/2)]];
+var wanted_velocity = null;
 
 // make an apple:
 var apple_x;
 var apple_y;
 new_apple();
 function new_apple() {
-    let [x,y] = snakes[snakes.length - 1];
-    do {
-        apple_x = Math.floor(Math.random() * GRID_W);
-        apple_y = Math.floor(Math.random() * GRID_H);
+    let x,y;
+    let done = false;
+    while(!done) {
+        done = true;
+        x = Math.floor(Math.random() * GRID_W);
+        y = Math.floor(Math.random() * GRID_H);
+        for (let e of snakes) {
+            if (x === e[0] && y === e[1]) {
+                done = false;
+                break;
+            }
+        }
     }
 
-    while (apple_x == x && apple_y == y );
-
-    
+    apple_y = y;
+    apple_x = x;
 }
 
 function draw_apple() {
@@ -43,9 +60,38 @@ function draw_apple() {
     }
 
 }
+// check user input -- ARROW KEYS:
+document.addEventListener("keydown", (e) => {
+    switch(e.key) {
+        case "ArrowDown":
+            if (velocity !== "ArrowUp")  {
+                velocity = e.key;                                           
+            }
+            break;
+         
+        case "ArrowUp":
+            if (velocity !== "ArrowDown")  {
+                velocity = e.key;                                           
+            }
+            break;
+        case "ArrowLeft":
+            if (velocity !== "ArrowRight")  {
+                velocity = e.key;                                           
+            }
+            break;
+        case "ArrowRight":
+            if (velocity !== "ArrowLeft")  {
+                velocity = e.key;                                           
+            }
+            break;
+        default:
+            break;
+    }
+});
+setTimeout(game, 1000/fps);
 
-setInterval(() => {
-
+function game() {
+    
     // remove the current snake:
     snakes.forEach(e => {
         let square = grid.children[e[1]*GRID_W + e[0]];
@@ -55,7 +101,6 @@ setInterval(() => {
     });
 
     let [head_x,head_y] = snakes[snakes.length-1];
-    console.log(head_x,head_y);
     let new_head_x = head_x;
     let new_head_y = head_y;
 
@@ -80,12 +125,12 @@ setInterval(() => {
         
         // check in range:
         if (new_head_x >= GRID_W) {
-           new_head_x = 0;
+        new_head_x = 0;
         } else if (new_head_x < 0) {
             new_head_x = GRID_W-1;
         }
         if (new_head_y >= GRID_H) {
-           new_head_y = 0;
+        new_head_y = 0;
         } else if (new_head_y < 0) {
             new_head_y = GRID_H-1;
         }
@@ -129,5 +174,6 @@ setInterval(() => {
     // and the apple:
     draw_apple();
 
+    setTimeout(game, 1000/fps);
 
-}, 1000/FPS);
+}
