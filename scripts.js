@@ -156,7 +156,10 @@ function game() {
         })
 
 
-        // if head is on an apple:
+        // and add new head...
+        snakes.push([new_head_x,new_head_y]);
+
+        // if new head is on an apple:
         if (apple_x == new_head_x && apple_y == new_head_y) {
             snake_length++;
 
@@ -168,9 +171,6 @@ function game() {
             // make new apple on map:
             new_apple();
         } 
-
-        // and add new head...
-        snakes.push([new_head_x,new_head_y]);
 
         // finally, we control the snake's length:
         while(snakes.length > snake_length) {
