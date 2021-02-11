@@ -2,28 +2,42 @@
     box-sizing: border-box;
 }
 
+.wrapper {
+    width: 100vh;
+    height: 100vh;
+}
 
 .main {
     position: absolute;
     width: 400px;
-    height: 350px;
+    height: 400px;
     left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
 }
 
 .grid {
+    width: 400px;
+    height: 350px;
     display: flex;
     flex-wrap: wrap;
 }
 
 .top {
     display: flex;
-    justify-content: space-between;
+    width: auto;
+    justify-content: center;
 }
 
 .top .speed {
     font-size: large;
     font-weight: bold;
+    font-family: monospace;
+    margin-right: 10px;
+}
+
+.dial {
+    width: auto;
 }
 
 .square {

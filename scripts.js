@@ -17,7 +17,7 @@ for (let i = 0; i < GRID_W*GRID_H; i++) {
     grid.appendChild(square);
 }
 
-// speed:
+// speed dial:
 speed_div.innerHTML = "FPS: " + FPS;
 speed_dial.value = FPS;
 
@@ -25,6 +25,10 @@ speed_dial.addEventListener("input", (e) => {
     fps = e.target.value;
     speed_div.innerHTML = "FPS: " + fps;
 
+})
+    // blocking keyboard input for the dial -- because it's confusing
+speed_dial.addEventListener("keydown", (e) =>{
+    e.preventDefault();
 })
 
 var snakes = [[Math.floor(GRID_W/2) -1 ,Math.floor(GRID_H/2)]];
@@ -34,6 +38,7 @@ var wanted_velocity = null;
 var apple_x;
 var apple_y;
 new_apple();
+
 function new_apple() {
     let x,y;
     let done = false;
@@ -48,7 +53,6 @@ function new_apple() {
             }
         }
     }
-
     apple_y = y;
     apple_x = x;
 }
@@ -60,7 +64,8 @@ function draw_apple() {
     }
 
 }
-// check user input -- ARROW KEYS:
+
+// to check user input -- ARROW KEYS:
 document.addEventListener("keydown", (e) => {
     switch(e.key) {
         case "ArrowDown":
@@ -88,11 +93,18 @@ document.addEventListener("keydown", (e) => {
             break;
     }
 });
+
+// call game in loops using nested setTimeout,
+// this is not recursive
 setTimeout(game, 1000/fps);
 
+
+
+// this is called every frame:
+
 function game() {
-    
-    // remove the current snake:
+    // remove the current onboard-snake --
+    // so we can draw a new one later...
     snakes.forEach(e => {
         let square = grid.children[e[1]*GRID_W + e[0]];
         if (square.classList.contains("snake")) {
@@ -100,11 +112,12 @@ function game() {
         }
     });
 
+    // the new head:
     let [head_x,head_y] = snakes[snakes.length-1];
     let new_head_x = head_x;
     let new_head_y = head_y;
 
-    // update, get user input:
+    // GET KEYBOARD INPUT AND UPDATE GAME:
     if (velocity) {
         switch(velocity) {
             case "ArrowUp":
@@ -123,7 +136,7 @@ function game() {
                 break;
         }
         
-        // check in range:
+        // check borders:
         if (new_head_x >= GRID_W) {
         new_head_x = 0;
         } else if (new_head_x < 0) {
@@ -135,14 +148,15 @@ function game() {
             new_head_y = GRID_H-1;
         }
 
-        // if head is in snake's body:
+
+        // if new head is on snake's body:
         snakes.forEach( e => {
             if (new_head_x == e[0] && new_head_y == e[1]) {
                 snake_length = START_LENGTH;           }
         })
 
-        snakes.push([new_head_x,new_head_y]);
-        // if head is apple:
+
+        // if head is on an apple:
         if (apple_x == new_head_x && apple_y == new_head_y) {
             snake_length++;
 
@@ -151,10 +165,14 @@ function game() {
             if (apple.classList.contains("apple")) {
                 apple.classList.remove("apple");
             }
-            // make new apple:
+            // make new apple on map:
             new_apple();
         } 
 
+        // and add new head...
+        snakes.push([new_head_x,new_head_y]);
+
+        // finally, we control the snake's length:
         while(snakes.length > snake_length) {
             snakes.shift();
         }
